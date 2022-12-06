@@ -32,11 +32,11 @@ func TestDayFourChallengeOne(t *testing.T) {
 
 func TestDayFourChallengeTwo(t *testing.T) {
 	tests := map[string]TestConfigStringSliceWantInt{
-		"Solve Day Four Challenge One example": {
+		"Solve Day Four Challenge Two example": {
 			input: []string{"2-4,6-8", "2-3,4-5", "5-7,7-9", "2-8,3-7", "6-6,4-6", "2-6,4-8"},
 			want:  4,
 		},
-		"Solve Day Four Challenge One actual": {
+		"Solve Day Four Challenge Two actual": {
 			input: func() []string {
 				res, _ := readFileIntoStringArray("./input/04.txt")
 				return res
