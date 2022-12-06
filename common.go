@@ -120,6 +120,8 @@ func Min[T constraints.Ordered](args ...T) T {
 	return min
 }
 
+// Generic slice intersection lazily copied from https://stackoverflow.com/a/72375462
+
 func SliceIntersection[T constraints.Ordered](in ...[]T) []T {
 	hash := make(map[T]*int)
 	for _, slice := range in {
