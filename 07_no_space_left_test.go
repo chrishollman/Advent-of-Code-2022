@@ -57,3 +57,23 @@ func TestDaySevenChallengeTwo(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkDaySevenChallengeOne(b *testing.B) {
+	input := func() []string {
+		res, _ := readFileIntoStringArray("./input/07.txt")
+		return res
+	}()
+	for n := 0; n < b.N; n++ {
+		daySevenChallengeOne(input)
+	}
+}
+
+func BenchmarkDaySevenChallengeTwo(b *testing.B) {
+	input := func() []string {
+		res, _ := readFileIntoStringArray("./input/07.txt")
+		return res
+	}()
+	for n := 0; n < b.N; n++ {
+		daySevenChallengeTwo(input)
+	}
+}
