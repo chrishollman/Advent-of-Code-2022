@@ -6,16 +6,13 @@ import (
 	"strings"
 )
 
-type Leader struct {
-	X           int
-	Y           int
-	Subordinate *Follower
-}
-
-type Follower struct {
+type Point struct {
 	X    int
 	Y    int
+	Num  int
 	Seen map[string]bool
+	Head *Point
+	Tail *Point
 }
 
 type Direction string
@@ -27,81 +24,150 @@ const (
 	Direction_RIGHT Direction = "R"
 )
 
-func NewLeader() *Leader {
-	return &Leader{
-		X: 0,
-		Y: 0,
-		Subordinate: &Follower{
-			X:    0,
-			Y:    0,
-			Seen: map[string]bool{"0,0": true},
-		},
+func NewPoint() *Point {
+	return &Point{
+		X:    0,
+		Y:    0,
+		Num:  1,
+		Seen: map[string]bool{"0,0": true},
+		Head: nil,
+		Tail: nil,
 	}
 }
 
-func (l *Leader) Move(d Direction, amount int) {
+func AddNewTail(p *Point) *Point {
+	p.Tail = NewPoint()
+	p.Tail.Num = p.Num + 1
+	p.Tail.Head = p
+	return p.Tail
+}
+
+func (p *Point) Move(d Direction, amount int) {
 	switch d {
 	case Direction_UP:
-		l.up(amount)
+		p.up(amount)
 	case Direction_DOWN:
-		l.down(amount)
+		p.down(amount)
 	case Direction_LEFT:
-		l.left(amount)
+		p.left(amount)
 	case Direction_RIGHT:
-		l.right(amount)
+		p.right(amount)
 	}
 }
 
-func (l *Leader) up(amount int) {
+func (p *Point) up(amount int) {
 	for i := 1; i <= amount; i++ {
-		l.updateSubordinate(l.X, l.Y+1)
-		l.Y += 1
+		p.Y += 1
+		if p.Tail != nil {
+			p.updateTailRecursive()
+		}
 	}
 }
 
-func (l *Leader) down(amount int) {
+func (p *Point) down(amount int) {
 	for i := 1; i <= amount; i++ {
-		l.updateSubordinate(l.X, l.Y-1)
-		l.Y -= 1
+		p.Y -= 1
+		if p.Tail != nil {
+			p.updateTailRecursive()
+		}
 	}
 }
 
-func (l *Leader) left(amount int) {
+func (p *Point) left(amount int) {
 	for i := 1; i <= amount; i++ {
-		l.updateSubordinate(l.X-1, l.Y)
-		l.X -= 1
+		p.X -= 1
+		if p.Tail != nil {
+			p.updateTailRecursive()
+		}
 	}
 }
 
-func (l *Leader) right(amount int) {
+func (p *Point) right(amount int) {
 	for i := 1; i <= amount; i++ {
-		l.updateSubordinate(l.X+1, l.Y)
-		l.X += 1
+		p.X += 1
+		if p.Tail != nil {
+			p.updateTailRecursive()
+		}
 	}
 }
 
-func (l *Leader) updateSubordinate(newX int, newY int) {
+func (p *Point) getStringCoordinates() string {
+	return fmt.Sprintf("%v,%v", p.X, p.Y)
+}
 
-	distX := abs(newX - l.Subordinate.X)
-	distY := abs(newY - l.Subordinate.Y)
-
-	if !(distX+distY <= 1) && !(distX == 1 && distY == 1) {
-		l.Subordinate.X = l.X
-		l.Subordinate.Y = l.Y
-		l.Subordinate.Seen[fmt.Sprintf("%v,%v", l.X, l.Y)] = true
+func (p *Point) updateTailRecursive() {
+	if p.Tail == nil {
+		return
 	}
+
+	p = p.Tail
+	distX := p.Head.X - p.X
+	distY := p.Head.Y - p.Y
+	absX := abs(distX)
+	absY := abs(distY)
+
+	// Parent within 1 unit of child
+	if absX <= 1 && absY <= 1 {
+		return
+		// Parent within 2 units (absX + absY <= 2) of child in one plane of movement (X or Y, not both)
+	} else if (absX == 2 && absY == 0) || (absX == 0 && absY == 2) {
+		switch {
+		case distX < 0:
+			p.X -= 1
+		case distX > 0:
+			p.X += 1
+		case distY < 0:
+			p.Y -= 1
+		case distY > 0:
+			p.Y += 1
+		}
+		// Parent greater 2 units (absX + absY >= 3) of child in more than one plane of movement (X and Y)
+	} else if absX+absY >= 3 {
+		switch {
+		case distX < 0:
+			p.X -= 1
+		case distX > 0:
+			p.X += 1
+		}
+		switch {
+		case distY < 0:
+			p.Y -= 1
+		case distY > 0:
+			p.Y += 1
+		}
+	}
+	p.Seen[p.getStringCoordinates()] = true
+	p.updateTailRecursive()
 }
 
 func dayNineChallengeOne(input []string) int {
 
-	leader := NewLeader()
+	head := NewPoint()
+	tail := AddNewTail(head)
 
 	for _, line := range input {
 		instruction := strings.Fields(line)
 		direction := Direction(instruction[0])
 		amount, _ := strconv.Atoi(instruction[1])
-		leader.Move(direction, amount)
+		head.Move(direction, amount)
 	}
 
-	return len(leader.Subordinate.Seen)
+	return len(tail.Seen)
+}
+
+func dayNineChallengeTwo(input []string) int {
+	head := NewPoint()
+	tail := head
+	for i := 1; i < 10; i++ {
+		tail = AddNewTail(tail)
+	}
+
+	for _, line := range input {
+		instruction := strings.Fields(line)
+		direction := Direction(instruction[0])
+		amount, _ := strconv.Atoi(instruction[1])
+		head.Move(direction, amount)
+	}
+
+	return len(tail.Seen)
 }
