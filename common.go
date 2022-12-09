@@ -148,3 +148,10 @@ func SliceIntersection[T constraints.Ordered](in ...[]T) []T {
 
 	return res
 }
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
