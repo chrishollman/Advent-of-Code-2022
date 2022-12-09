@@ -9,7 +9,6 @@ import (
 type Point struct {
 	X    int
 	Y    int
-	Num  int
 	Seen map[string]bool
 	Head *Point
 	Tail *Point
@@ -28,8 +27,7 @@ func NewPoint() *Point {
 	return &Point{
 		X:    0,
 		Y:    0,
-		Num:  1,
-		Seen: map[string]bool{"0,0": true},
+		Seen: nil,
 		Head: nil,
 		Tail: nil,
 	}
@@ -37,7 +35,6 @@ func NewPoint() *Point {
 
 func AddNewTail(p *Point) *Point {
 	p.Tail = NewPoint()
-	p.Tail.Num = p.Num + 1
 	p.Tail.Head = p
 	return p.Tail
 }
@@ -97,6 +94,7 @@ func (p *Point) getStringCoordinates() string {
 
 func (p *Point) updateTailRecursive() {
 	if p.Tail == nil {
+		p.Seen[p.getStringCoordinates()] = true
 		return
 	}
 
@@ -106,11 +104,11 @@ func (p *Point) updateTailRecursive() {
 	absX := abs(distX)
 	absY := abs(distY)
 
-	// Parent within 1 unit of child
 	if absX <= 1 && absY <= 1 {
+		// Parent within 1 unit of child, no movement necessary and early exit
 		return
-		// Parent within 2 units (absX + absY <= 2) of child in one plane of movement (X or Y, not both)
 	} else if (absX == 2 && absY == 0) || (absX == 0 && absY == 2) {
+		// Parent within 2 units (absX + absY <= 2) of child in one plane of movement (X or Y, not both)
 		switch {
 		case distX < 0:
 			p.X -= 1
@@ -121,8 +119,8 @@ func (p *Point) updateTailRecursive() {
 		case distY > 0:
 			p.Y += 1
 		}
-		// Parent greater 2 units (absX + absY >= 3) of child in more than one plane of movement (X and Y)
 	} else if absX+absY >= 3 {
+		// Parent greater 2 units (absX + absY >= 3) of child in more than one plane of movement (X and Y)
 		switch {
 		case distX < 0:
 			p.X -= 1
@@ -136,7 +134,7 @@ func (p *Point) updateTailRecursive() {
 			p.Y += 1
 		}
 	}
-	p.Seen[p.getStringCoordinates()] = true
+
 	p.updateTailRecursive()
 }
 
@@ -144,6 +142,8 @@ func dayNineChallengeOne(input []string) int {
 
 	head := NewPoint()
 	tail := AddNewTail(head)
+	tail.Seen = make(map[string]bool, len(input)*2)
+	tail.Seen["0,0"] = true
 
 	for _, line := range input {
 		instruction := strings.Fields(line)
@@ -161,6 +161,8 @@ func dayNineChallengeTwo(input []string) int {
 	for i := 1; i < 10; i++ {
 		tail = AddNewTail(tail)
 	}
+	tail.Seen = make(map[string]bool, len(input)*2)
+	tail.Seen["0,0"] = true
 
 	for _, line := range input {
 		instruction := strings.Fields(line)
