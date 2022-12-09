@@ -23,78 +23,46 @@ const (
 	Direction_RIGHT Direction = "R"
 )
 
-func NewPoint() *Point {
-	return &Point{
-		X:    0,
-		Y:    0,
-		Seen: nil,
-		Head: nil,
-		Tail: nil,
-	}
-}
-
-func AddNewTail(p *Point) *Point {
-	p.Tail = NewPoint()
-	p.Tail.Head = p
-	return p.Tail
+func (p *Point) GetStringCoordinates() string {
+	return fmt.Sprintf("%v,%v", p.X, p.Y)
 }
 
 func (p *Point) Move(d Direction, amount int) {
 	switch d {
 	case Direction_UP:
-		p.up(amount)
+		for i := 1; i <= amount; i++ {
+			p.Y += 1
+			if p.Tail != nil {
+				p.updateTailRecursive()
+			}
+		}
 	case Direction_DOWN:
-		p.down(amount)
+		for i := 1; i <= amount; i++ {
+			p.Y -= 1
+			if p.Tail != nil {
+				p.updateTailRecursive()
+			}
+		}
 	case Direction_LEFT:
-		p.left(amount)
+		for i := 1; i <= amount; i++ {
+			p.X -= 1
+			if p.Tail != nil {
+				p.updateTailRecursive()
+			}
+		}
 	case Direction_RIGHT:
-		p.right(amount)
-	}
-}
-
-func (p *Point) up(amount int) {
-	for i := 1; i <= amount; i++ {
-		p.Y += 1
-		if p.Tail != nil {
-			p.updateTailRecursive()
+		for i := 1; i <= amount; i++ {
+			p.X += 1
+			if p.Tail != nil {
+				p.updateTailRecursive()
+			}
 		}
 	}
-}
-
-func (p *Point) down(amount int) {
-	for i := 1; i <= amount; i++ {
-		p.Y -= 1
-		if p.Tail != nil {
-			p.updateTailRecursive()
-		}
-	}
-}
-
-func (p *Point) left(amount int) {
-	for i := 1; i <= amount; i++ {
-		p.X -= 1
-		if p.Tail != nil {
-			p.updateTailRecursive()
-		}
-	}
-}
-
-func (p *Point) right(amount int) {
-	for i := 1; i <= amount; i++ {
-		p.X += 1
-		if p.Tail != nil {
-			p.updateTailRecursive()
-		}
-	}
-}
-
-func (p *Point) getStringCoordinates() string {
-	return fmt.Sprintf("%v,%v", p.X, p.Y)
 }
 
 func (p *Point) updateTailRecursive() {
 	if p.Tail == nil {
-		p.Seen[p.getStringCoordinates()] = true
+		p.Seen[p.GetStringCoordinates()] = true
 		return
 	}
 
@@ -138,10 +106,26 @@ func (p *Point) updateTailRecursive() {
 	p.updateTailRecursive()
 }
 
+func NewHead() *Point {
+	return &Point{
+		X:    0,
+		Y:    0,
+		Seen: nil,
+		Head: nil,
+		Tail: nil,
+	}
+}
+
+func NewTail(p *Point) *Point {
+	p.Tail = NewHead()
+	p.Tail.Head = p
+	return p.Tail
+}
+
 func dayNineChallengeOne(input []string) int {
 
-	head := NewPoint()
-	tail := AddNewTail(head)
+	head := NewHead()
+	tail := NewTail(head)
 	tail.Seen = make(map[string]bool, len(input)*2)
 	tail.Seen["0,0"] = true
 
@@ -156,10 +140,10 @@ func dayNineChallengeOne(input []string) int {
 }
 
 func dayNineChallengeTwo(input []string) int {
-	head := NewPoint()
+	head := NewHead()
 	tail := head
 	for i := 1; i < 10; i++ {
-		tail = AddNewTail(tail)
+		tail = NewTail(tail)
 	}
 	tail.Seen = make(map[string]bool, len(input)*2)
 	tail.Seen["0,0"] = true
