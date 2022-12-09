@@ -22,9 +22,9 @@ type File struct {
 func (d *Directory) addDirectory(name string) *Directory {
 	subd := d.getSubdirectory(name)
 	if subd == nil {
-		new := NewDirectory(name, d)
-		d.SubDirectories = append(d.SubDirectories, new)
-		return new
+		created := NewDirectory(name, d)
+		d.SubDirectories = append(d.SubDirectories, created)
+		return created
 	}
 	return subd
 }

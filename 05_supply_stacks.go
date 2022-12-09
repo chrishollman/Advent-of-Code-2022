@@ -16,7 +16,7 @@ func dayFiveChallengeOne(input []string) string {
 		fromStack := move[1] - 1 // Account for 0 index
 		toStack := move[2] - 1   // Account for 0 index
 
-		for i := numCrates; i > 0; i -= 1 {
+		for i := numCrates; i > 0; i-- {
 			if val, ok := stacks[fromStack].Pop(); ok {
 				stacks[toStack].Push(val)
 			}
@@ -45,13 +45,13 @@ func dayFiveChallengeTwo(input []string) string {
 		toStack := move[2] - 1   // Account for 0 index
 
 		var tmpStack Stack
-		for i := numCrates; i > 0; i -= 1 {
+		for i := numCrates; i > 0; i-- {
 			if val, ok := stacks[fromStack].Pop(); ok {
 				tmpStack.Push(val)
 			}
 		}
 
-		for j := numCrates; j > 0; j -= 1 {
+		for j := numCrates; j > 0; j-- {
 			if val, ok := tmpStack.Pop(); ok {
 				stacks[toStack].Push(val)
 			}
@@ -72,7 +72,7 @@ func getSupplyStacks(input []string) []Stack {
 	maxIdx := len(input[0]) - 2
 	stacks := make([]Stack, (len(input[0])/4 + 1))
 
-	for i := len(input) - 1; i >= 0; i -= 1 {
+	for i := len(input) - 1; i >= 0; i-- {
 		for j := 1; j <= maxIdx; j += 4 {
 			val := string(input[i][j])
 			if val != " " {

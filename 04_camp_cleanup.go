@@ -21,7 +21,7 @@ func dayFourChallengeOne(values []string) int {
 
 		if (firstMin <= secondMin && firstMax >= secondMax) ||
 			(secondMin <= firstMin && secondMax >= firstMax) {
-			total += 1
+			total++
 		}
 	}
 
@@ -44,7 +44,7 @@ func dayFourChallengeTwo(values []string) int {
 
 		if (firstMax >= secondMin && firstMin <= secondMax) ||
 			(secondMax >= firstMin && secondMin <= firstMax) {
-			total += 1
+			total++
 		}
 	}
 

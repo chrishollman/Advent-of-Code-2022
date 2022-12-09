@@ -17,10 +17,10 @@ type Point struct {
 type Direction string
 
 const (
-	Direction_UP    Direction = "U"
-	Direction_DOWN  Direction = "D"
-	Direction_LEFT  Direction = "L"
-	Direction_RIGHT Direction = "R"
+	up    Direction = "U"
+	down  Direction = "D"
+	left  Direction = "L"
+	right Direction = "R"
 )
 
 func (p *Point) GetStringCoordinates() string {
@@ -29,30 +29,30 @@ func (p *Point) GetStringCoordinates() string {
 
 func (p *Point) Move(d Direction, amount int) {
 	switch d {
-	case Direction_UP:
+	case up:
 		for i := 1; i <= amount; i++ {
-			p.Y += 1
+			p.Y++
 			if p.Tail != nil {
 				p.updateTailRecursive()
 			}
 		}
-	case Direction_DOWN:
+	case down:
 		for i := 1; i <= amount; i++ {
-			p.Y -= 1
+			p.Y--
 			if p.Tail != nil {
 				p.updateTailRecursive()
 			}
 		}
-	case Direction_LEFT:
+	case left:
 		for i := 1; i <= amount; i++ {
-			p.X -= 1
+			p.X--
 			if p.Tail != nil {
 				p.updateTailRecursive()
 			}
 		}
-	case Direction_RIGHT:
+	case right:
 		for i := 1; i <= amount; i++ {
-			p.X += 1
+			p.X++
 			if p.Tail != nil {
 				p.updateTailRecursive()
 			}
@@ -79,27 +79,27 @@ func (p *Point) updateTailRecursive() {
 		// Parent within 2 units (absX + absY <= 2) of child in one plane of movement (X or Y, not both)
 		switch {
 		case distX < 0:
-			p.X -= 1
+			p.X--
 		case distX > 0:
-			p.X += 1
+			p.X++
 		case distY < 0:
-			p.Y -= 1
+			p.Y--
 		case distY > 0:
-			p.Y += 1
+			p.Y++
 		}
 	} else if absX+absY >= 3 {
 		// Parent greater 2 units (absX + absY >= 3) of child in more than one plane of movement (X and Y)
 		switch {
 		case distX < 0:
-			p.X -= 1
+			p.X--
 		case distX > 0:
-			p.X += 1
+			p.X++
 		}
 		switch {
 		case distY < 0:
-			p.Y -= 1
+			p.Y--
 		case distY > 0:
-			p.Y += 1
+			p.Y++
 		}
 	}
 
@@ -123,7 +123,6 @@ func NewTail(p *Point) *Point {
 }
 
 func dayNineChallengeOne(input []string) int {
-
 	head := NewHead()
 	tail := NewTail(head)
 	tail.Seen = make(map[string]bool, len(input)*2)

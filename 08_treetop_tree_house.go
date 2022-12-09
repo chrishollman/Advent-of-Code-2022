@@ -110,7 +110,7 @@ func dayEightChallengeTwo(input []string) int {
 			canSee := 0
 			for y2 := y - 1; y2 >= 0; y2-- {
 				candidate := input[y2][x]
-				canSee += 1
+				canSee++
 				if candidate >= current {
 					break
 				}
@@ -122,7 +122,7 @@ func dayEightChallengeTwo(input []string) int {
 			canSee = 0
 			for y2 := y + 1; y2 < h; y2++ {
 				candidate := input[y2][x]
-				canSee += 1
+				canSee++
 				if candidate >= current {
 					break
 				}
@@ -133,7 +133,7 @@ func dayEightChallengeTwo(input []string) int {
 			canSee = 0
 			for x2 := x - 1; x2 >= 0; x2-- {
 				candidate := input[y][x2]
-				canSee += 1
+				canSee++
 				if candidate >= current {
 					break
 				}
@@ -144,7 +144,7 @@ func dayEightChallengeTwo(input []string) int {
 			canSee = 0
 			for x2 := x + 1; x2 < w; x2++ {
 				candidate := input[y][x2]
-				canSee += 1
+				canSee++
 				if candidate >= current {
 					break
 				}
