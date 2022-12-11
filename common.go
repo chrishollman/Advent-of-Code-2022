@@ -9,25 +9,38 @@ import (
 
 // Stack implementation lazily copied from https://www.educative.io/answers/how-to-implement-a-stack-in-golang
 
-type Stack []string
-
-func (s *Stack) IsEmpty() bool {
-	return len(*s) == 0
+type Stack[T any] struct {
+	vals []T
 }
 
-func (s *Stack) Push(str string) {
-	*s = append(*s, str)
-}
-
-func (s *Stack) Pop() (string, bool) {
-	if s.IsEmpty() {
-		return "", false
+func (s *Stack[T]) IsEmpty() bool {
+	if len(s.vals) == 0 {
+		return true
 	}
-	index := len(*s) - 1
-	element := (*s)[index]
-	*s = (*s)[:index]
-	return element, true
+	return false
+}
 
+func (s *Stack[T]) Push(val T) {
+	s.vals = append(s.vals, val)
+}
+
+func (s *Stack[T]) Pop() (T, bool) {
+	if s.IsEmpty() {
+		var blank T
+		return blank, false
+	}
+	top := len(s.vals) - 1
+	el := s.vals[top]
+	s.vals = s.vals[:top]
+	return el, true
+}
+
+func (s *Stack[T]) Peek() (T, bool) {
+	if s.IsEmpty() {
+		var blank T
+		return blank, false
+	}
+	return s.vals[len(s.vals)-1], true
 }
 
 type TestConfigStringSliceWantInt struct {
