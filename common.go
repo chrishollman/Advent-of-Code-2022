@@ -43,6 +43,31 @@ func (s *Stack[T]) Peek() (T, bool) {
 	return s.vals[len(s.vals)-1], true
 }
 
+type Queue[T any] struct {
+	vals []T
+}
+
+func (q *Queue[T]) IsEmpty() bool {
+	if len(q.vals) == 0 {
+		return true
+	}
+	return false
+}
+
+func (q *Queue[T]) Enqueue(val T) {
+	q.vals = append(q.vals, val)
+}
+
+func (q *Queue[T]) Dequeue() (T, bool) {
+	if q.IsEmpty() {
+		var blank T
+		return blank, false
+	}
+	front := q.vals[0]
+	q.vals = q.vals[1:]
+	return front, true
+}
+
 type TestConfigStringSliceWantInt struct {
 	input []string
 	want  int
