@@ -7,11 +7,11 @@ import (
 )
 
 type cpu struct {
-	ctr         int
-	regX        int
-	historicalX []int
-	image       [6][40]rune
-	postCycle   Queue[instruction]
+	cycle           int
+	register        int
+	registerHistory []int
+	image           [6][40]rune
+	postCycle       Queue[instruction]
 }
 
 type instruction struct {
@@ -28,11 +28,11 @@ const (
 
 func NewCPU() *cpu {
 	return &cpu{
-		ctr:         1,
-		regX:        1,
-		historicalX: []int{1},
-		image:       [6][40]rune{},
-		postCycle:   Queue[instruction]{},
+		cycle:           1,
+		register:        1,
+		registerHistory: []int{1},
+		image:           [6][40]rune{},
+		postCycle:       Queue[instruction]{},
 	}
 }
 
@@ -55,43 +55,43 @@ func (c *cpu) Command(com command, v int) {
 	}
 }
 
-func (c *cpu) Cycle() {
-
-	// Draw image pixel
-	line := (c.ctr - 1) / 40
-	pos := (c.ctr - 1) % 40
-	if abs(c.regX-pos) <= 1 {
-		c.image[line][pos] = '#'
-	} else {
-		c.image[line][pos] = '.'
-	}
-
-	// Increment cycle counter
-	c.ctr++
-
-	// Run postcycle functions
-	if !c.postCycle.IsEmpty() {
-		instr, _ := c.postCycle.Dequeue()
-		c.Exec(instr.command, instr.value)
-	}
-
-	// Update register historical value
-	c.historicalX = append(c.historicalX, c.regX)
-}
-
 func (c *cpu) Exec(com command, v int) {
 	switch com {
 	case addx:
-		c.regX += v
+		c.register += v
 		return
 	default:
 		return
 	}
 }
 
+func (c *cpu) RunCycle() {
+	c.UpdateImageBuffer()
+	c.cycle++
+
+	// Run postcycle commands
+	if !c.postCycle.IsEmpty() {
+		instr, _ := c.postCycle.Dequeue()
+		c.Exec(instr.command, instr.value)
+	}
+
+	// Update register history
+	c.registerHistory = append(c.registerHistory, c.register)
+}
+
 func (c *cpu) RunCycleLoop() {
 	for !c.postCycle.IsEmpty() {
-		c.Cycle()
+		c.RunCycle()
+	}
+}
+
+func (c *cpu) UpdateImageBuffer() {
+	line := (c.cycle - 1) / 40
+	pos := (c.cycle - 1) % 40
+	if abs(c.register-pos) <= 1 {
+		c.image[line][pos] = '#'
+	} else {
+		c.image[line][pos] = '.'
 	}
 }
 
@@ -117,7 +117,7 @@ func dayTenChallengeOne(input []string) int {
 
 	total := 0
 	for i := 20; i <= 220; i = i + 40 {
-		total += cpu.historicalX[i-1] * i
+		total += cpu.registerHistory[i-1] * i
 	}
 
 	return total
