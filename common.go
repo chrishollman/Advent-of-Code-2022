@@ -193,3 +193,53 @@ func abs(x int) int {
 	}
 	return x
 }
+
+// Example priority queue adapted from https://pkg.go.dev/container/heap
+
+// Interfaces & associated ideas for A* from https://github.com/beefsack/go-astar
+type pathNode interface {
+	GetNeighbours() []pathNode
+	EstCostToNeighbour(to pathNode) int
+}
+
+type pathNodeWrapper struct {
+	pathNode pathNode
+	cost     int
+	rank     int
+	parent   *pathNodeWrapper
+	open     bool
+	closed   bool
+	index    int
+}
+
+// A PriorityQueue implements heap.Interface and holds Items.
+type PriorityQueue []*pathNodeWrapper
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	return pq[i].rank < pq[j].rank
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq *PriorityQueue) Push(x any) {
+	n := len(*pq)
+	item := x.(*pathNodeWrapper)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() any {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil  // avoid memory leak
+	item.index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
+}
